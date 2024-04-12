@@ -15,8 +15,10 @@
                 <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" />
                 <DataGridTextColumn Header="Мин Количиство" Binding="{Binding MinQuantity}" />
                 <DataGridTextColumn Header="Цена" Binding="{Binding Price}" />
-                <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice}" />
+                <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, Mode=OneWay}" />
             </DataGrid.Columns>
         </DataGrid>
+
+        <Button Content="Добавить в базу" Margin="10,10,0,0" Click="Button_Click" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
     </Grid>
 </Window>

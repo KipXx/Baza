@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System;
+using System.Data.SQLite;
 
 
 namespace Baza
@@ -25,22 +26,42 @@ namespace Baza
             InitializeComponent();
 
             DataContext = this;
-            Products = GetProducts();
+            Products = DatabaseHelper.GetProducts();
         }
 
-        public ObservableCollection<Product> Products { get; set; }
+    public ObservableCollection<Product> Products { get; set; }
+
+        private void SaveToDatabase()
+        {
+            string connectionString = "Data Source=C:\\Users\\Vadim\\Desktop\\DiplomSoft\\Baza\\Baza\\DataBase.db";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                foreach (var product in Products)
+                {
+                    string query = $"INSERT INTO Products (ProductId, Name, Quantity, MinQuantity, Price) " +
+                                   $"VALUES ({product.ProductId}, '{product.Name}', {product.Quantity}, {product.MinQuantity}, {product.Price})";
+
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
 
         private ObservableCollection<Product> GetProducts()
         {
             ObservableCollection<Product> products = new ObservableCollection<Product>();
 
-            // Добавляем несколько тестовых продуктов
-            products.Add(new Product { ProductId = 1, Name = "Product 1", Quantity = 10, Price = 10.99m });
-            products.Add(new Product { ProductId = 2, Name = "Product 2", Quantity = 15, Price = 20.49m });
-            products.Add(new Product { ProductId = 3, Name = "Product 3", Quantity = 6, Price = 15.29m });
-
             return products;
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            SaveToDatabase();
+        }
     }
 }
