@@ -27,6 +27,7 @@ namespace Baza
                             {
                                 ProductId = Convert.ToInt32(reader["ProductId"]),
                                 Name = reader["Name"].ToString(),
+                                Material = reader["Material"].ToString(), // Чтение нового столбца "Материал"
                                 Quantity = Convert.ToInt32(reader["Quantity"]),
                                 MinQuantity = Convert.ToInt32(reader["MinQuantity"]),
                                 Price = Convert.ToDecimal(reader["Price"])

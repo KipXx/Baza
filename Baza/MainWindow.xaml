@@ -12,6 +12,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding ProductId}" />
                 <DataGridTextColumn Header="Имя" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="Материал" Binding="{Binding Material}" />
                 <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" />
                 <DataGridTextColumn Header="Мин Количиство" Binding="{Binding MinQuantity}" />
                 <DataGridTextColumn Header="Цена" Binding="{Binding Price}" />
@@ -20,5 +21,7 @@
         </DataGrid>
 
         <Button Content="Добавить в базу" Margin="10,10,0,0" Click="Button_Click" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
+        <Button Content="Добавить из базы" Margin="160,10,0,0" Click="Button_Click_Load" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
+        <Button Content="Очистить" HorizontalAlignment="Left" Margin="10,0,0,10" Width="80" Click="ClearButton_Click" Height="30" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
