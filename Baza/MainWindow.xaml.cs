@@ -19,21 +19,20 @@ namespace Baza
 
     public partial class MainWindow : Window
     {
+
+        private static string connectionString = "Data Source=./DataBase.db"; // Подключение к базе данных !!!ОСНОВНОЕ!!!
+
         public MainWindow()
         {
             InitializeComponent();
-
             DataContext = this;
-            
         }
 
         public ObservableCollection<Product> Products { get; set; } = new ObservableCollection<Product>();
 
-        private void SaveToDatabase()
+        private void SaveToDatabase() // Сохранить из таблицы
         {
-            string connectionString = "Data Source=C:\\Users\\Vadim\\Desktop\\DiplomSoft\\Baza\\Baza\\DataBase.db";
-
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
@@ -63,9 +62,8 @@ namespace Baza
             }
         }
 
-        private void LoadDataFromDatabase()
+        private void LoadDataFromDatabase() // Загрузить в таблицу
         {
-            string connectionString = "Data Source=C:\\Users\\Vadim\\Desktop\\DiplomSoft\\Baza\\Baza\\DataBase.db";
             string query = "SELECT * FROM Products";
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
@@ -94,9 +92,8 @@ namespace Baza
             }
         }
 
-        public void LoadFilDatabase()
+        public void LoadFilDatabase() // Загрузить в таблицу с фильтром
         {
-            string connectionString = "Data Source=C:\\Users\\Vadim\\Desktop\\DiplomSoft\\Baza\\Baza\\DataBase.db";
             string query = "SELECT * FROM Products WHERE 1=1";
 
             // Проверяем заполнение поля "Имя"
@@ -142,13 +139,11 @@ namespace Baza
                     }
                 }
             }
-
-
         }
 
-        private void PasteWithReplace()
+
+        private void PasteWithReplace() // Замена существующих данных из таблицы
         {
-            string connectionString = "Data Source=C:\\Users\\Vadim\\Desktop\\DiplomSoft\\Baza\\Baza\\DataBase.db";
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -207,7 +202,7 @@ namespace Baza
         {
             Products.Clear();
         }
-        
+
         private void UpdateDatabase_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Вы уверены, что хотите заменить данные?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -219,7 +214,6 @@ namespace Baza
             else
             {
             }
-
         }
 
         private void AddFil_Click(object sender, RoutedEventArgs e)
