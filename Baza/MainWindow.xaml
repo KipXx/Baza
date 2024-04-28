@@ -12,11 +12,33 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding ProductId}" />
                 <DataGridTextColumn Header="Имя" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="Материал" Binding="{Binding Material}" />
                 <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" />
                 <DataGridTextColumn Header="Мин Количиство" Binding="{Binding MinQuantity}" />
                 <DataGridTextColumn Header="Цена" Binding="{Binding Price}" />
-                <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice}" />
+                <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, Mode=OneWay}" />
             </DataGrid.Columns>
         </DataGrid>
+
+        <Button Content="Добавить в базу" Margin="10,10,0,0" Click="Button_Click" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
+        <Button Content="Добавить из базы" Margin="160,10,0,0" Click="Button_Click_Load" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
+
+        <Button Content="Очистить" HorizontalAlignment="Left" Margin="10,0,0,10" Width="80" Click="ClearButton_Click" Height="30" VerticalAlignment="Bottom"/>
+
+        <Button Content="Обновить данные" Margin="10,49,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="UpdateDatabase_Click" VerticalAlignment="Top"/>
+
+
+        <Grid HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" Width="700">
+
+            <Label Content="Материал:" Margin="200,0,0,0" Height="25" VerticalAlignment="Center" HorizontalAlignment="Left" Width="80"/>
+            <Label Content="Имя:" Height="25" VerticalAlignment="Center" HorizontalAlignment="Left" Width="40"/>
+            <TextBox x:Name="Nfil" TextWrapping="Wrap" Text="" Margin="45,4,0,0" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150"/>
+            <TextBox x:Name="Mfil" TextWrapping="Wrap" Text="" Margin="285,4,0,0" Height="21" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150"/>
+            <Button Content="Очистить" HorizontalAlignment="Left" Margin="440,0,0,0" Width="90" Click="Button_Clear"/>
+            <Button Content="Добавить с фильтром" Margin="535,0,0,0" HorizontalAlignment="Left" Width="130" Height="25" VerticalAlignment="Center" Click="AddFil_Click"/>
+
+        </Grid>
+
+
     </Grid>
 </Window>
