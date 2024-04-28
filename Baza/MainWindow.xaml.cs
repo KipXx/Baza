@@ -2,6 +2,7 @@
 using System.Windows;
 using System;
 using System.Data.SQLite;
+using System.Collections.Generic;
 
 
 namespace Baza
@@ -32,6 +33,8 @@ namespace Baza
 
         private void SaveToDatabase() // Сохранить из таблицы
         {
+            List<string> messages = new List<string>(); // Создаем список для сообщений
+
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -45,8 +48,8 @@ namespace Baza
                         int count = Convert.ToInt32(checkCommand.ExecuteScalar());
                         if (count > 0)
                         {
-                            // Если продукт с таким ID уже существует, выведем предупреждение
-                            MessageBox.Show($"Продукт с ID {product.ProductId} уже существует в базе данных!", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            // Если продукт с таким ID уже существует, добавляем предупреждение в список
+                            messages.Add($"Товар с ID {product.ProductId}");
                             continue; // Пропускаем вставку этого продукта и переходим к следующему
                         }
                     }
@@ -60,7 +63,15 @@ namespace Baza
                     }
                 }
             }
+
+            // Выводим все предупреждения из списка в одном окне
+            if (messages.Count > 0)
+            {
+                string allMessages = string.Join("\n", messages) + "\nУже существуют в базе данных!";
+                MessageBox.Show(allMessages, "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
+
 
         private void LoadDataFromDatabase() // Загрузить в таблицу
         {
@@ -180,6 +191,71 @@ namespace Baza
             }
         }
 
+        private void Nfil_spisoc()
+        {
+            Nfil.Items.Clear();
+
+            // Используем HashSet для хранения уникальных значений
+            HashSet<string> uniqueNames = new HashSet<string>();
+
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                Console.WriteLine("Executing query: SELECT Name FROM Products"); // Log the query
+                var command = new SQLiteCommand("SELECT Name FROM Products", connection);
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string productName = reader["Name"].ToString();
+
+                    // Проверяем, было ли слово уже добавлено
+                    if (!uniqueNames.Contains(productName))
+                    {
+                        Nfil.Items.Add(productName);
+                        uniqueNames.Add(productName); // Добавляем слово в HashSet
+                    }
+                }
+
+                reader.Close();
+                connection.Close();
+            }
+        }
+
+        private void Mfil_spisoc()
+        {
+            Mfil.Items.Clear();
+
+            // Используем HashSet для хранения уникальных значений
+            HashSet<string> uniqueMaterial = new HashSet<string>();
+
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                Console.WriteLine("Executing query: SELECT Material FROM Products"); // Log the query
+                var command = new SQLiteCommand("SELECT Material FROM Products", connection);
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string productMaterial = reader["Material"].ToString();
+
+                    // Проверяем, было ли слово уже добавлено
+                    if (!uniqueMaterial.Contains(productMaterial))
+                    {
+                        Mfil.Items.Add(productMaterial);
+                        uniqueMaterial.Add(productMaterial); // Добавляем слово в HashSet
+                    }
+                }
+
+                reader.Close();
+                connection.Close();
+            }
+        }
+
+
 
         private ObservableCollection<Product> GetProducts()
         {
@@ -225,6 +301,16 @@ namespace Baza
         {
             Mfil.Text = "";
             Nfil.Text = "";
+        }
+
+        private void Mfil_Click(object sender, EventArgs e)
+        {
+            Mfil_spisoc();
+        }
+
+        private void Nfil_Click(object sender, EventArgs e)
+        {
+            Nfil_spisoc();
         }
     }
 }
