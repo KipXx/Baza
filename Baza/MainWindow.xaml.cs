@@ -4,6 +4,9 @@ using System;
 using System.Data.SQLite;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Input;
+using static Baza.AddProductWindow;
 
 
 namespace Baza
@@ -61,6 +64,7 @@ namespace Baza
                     using (SQLiteCommand command = new SQLiteCommand(query, connection))
                     {
                         command.ExecuteNonQuery();
+                        MessageBox.Show("Товар добавлен в таблицу", "Добавлено", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
@@ -192,30 +196,30 @@ namespace Baza
             }
         }
 
-        private void Nfil_spisoc()
+        private void FillList(ComboBox comboBox, string columnName)
         {
-            Nfil.Items.Clear();
+            comboBox.Items.Clear();
 
             // Используем HashSet для хранения уникальных значений
-            HashSet<string> uniqueNames = new HashSet<string>();
+            HashSet<string> uniqueValues = new HashSet<string>();
 
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
-                Console.WriteLine("Executing query: SELECT Name FROM Products"); // Log the query
-                var command = new SQLiteCommand("SELECT Name FROM Products", connection);
+                Console.WriteLine($"Executing query: SELECT {columnName} FROM Products"); // Log the query
+                var command = new SQLiteCommand($"SELECT {columnName} FROM Products", connection);
                 var reader = command.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    string productName = reader["Name"].ToString();
+                    string value = reader[columnName].ToString();
 
-                    // Проверяем, было ли слово уже добавлено
-                    if (!uniqueNames.Contains(productName))
+                    // Проверяем, было ли значение уже добавлено
+                    if (!uniqueValues.Contains(value))
                     {
-                        Nfil.Items.Add(productName);
-                        uniqueNames.Add(productName); // Добавляем слово в HashSet
+                        comboBox.Items.Add(value);
+                        uniqueValues.Add(value); // Добавляем значение в HashSet
                     }
                 }
 
@@ -224,39 +228,7 @@ namespace Baza
             }
         }
 
-        private void Mfil_spisoc()
-        {
-            Mfil.Items.Clear();
-
-            // Используем HashSet для хранения уникальных значений
-            HashSet<string> uniqueMaterial = new HashSet<string>();
-
-            using (var connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                Console.WriteLine("Executing query: SELECT Material FROM Products"); // Log the query
-                var command = new SQLiteCommand("SELECT Material FROM Products", connection);
-                var reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string productMaterial = reader["Material"].ToString();
-
-                    // Проверяем, было ли слово уже добавлено
-                    if (!uniqueMaterial.Contains(productMaterial))
-                    {
-                        Mfil.Items.Add(productMaterial);
-                        uniqueMaterial.Add(productMaterial); // Добавляем слово в HashSet
-                    }
-                }
-
-                reader.Close();
-                connection.Close();
-            }
-        }
-
-        private void DeleteSelectedProducts()
+        private void DeleteSelectedProducts() // Удаление данных из базы данных
         {
             if (DataGrid.SelectedItems.Count > 0)
             {
@@ -277,12 +249,18 @@ namespace Baza
                     Products.Remove(product);
                 }
 
-                MessageBox.Show("Выбранные продукты были успешно удалены.");
+                MessageBox.Show("Выбранные товары были успешно удалены!");
             }
             else
             {
-                MessageBox.Show("Нет выбранных продуктов для удаления.");
+                MessageBox.Show("Нет выбранных продуктов для удаления!");
             }
+        }
+
+        private void OnlyNumbers(object sender, TextCompositionEventArgs e)
+        {
+            AddProductWindow addProductWindow = new AddProductWindow();
+            addProductWindow.OnlyNumber(e);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -326,12 +304,12 @@ namespace Baza
 
         private void Mfil_Click(object sender, EventArgs e)
         {
-            Mfil_spisoc();
+            FillList(Mfil, "Material");
         }
 
         private void Nfil_Click(object sender, EventArgs e)
         {
-            Nfil_spisoc();
+            FillList(Nfil, "Name");
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
@@ -345,6 +323,12 @@ namespace Baza
             else
             {
             }
+        }
+
+        private void AddNewWindow_Click(object sender, RoutedEventArgs e)
+        {
+            AddProductWindow addProductWindow = new AddProductWindow();
+            addProductWindow.Show();
         }
     }
 }
