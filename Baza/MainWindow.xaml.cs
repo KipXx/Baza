@@ -3,6 +3,7 @@ using System.Windows;
 using System;
 using System.Data.SQLite;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Baza
@@ -255,13 +256,33 @@ namespace Baza
             }
         }
 
-
-
-        private ObservableCollection<Product> GetProducts()
+        private void DeleteSelectedProducts()
         {
-            ObservableCollection<Product> products = new ObservableCollection<Product>();
+            if (DataGrid.SelectedItems.Count > 0)
+            {
+                var selectedProducts = new List<Product>(DataGrid.SelectedItems.Cast<Product>());
+                foreach (var product in selectedProducts)
+                {
+                    // Удаление продукта из базы данных
+                    using (var connection = new SQLiteConnection(connectionString))
+                    {
+                        connection.Open();
+                        var command = connection.CreateCommand();
+                        command.CommandText = "DELETE FROM Products WHERE ProductId = @ProductId";
+                        command.Parameters.AddWithValue("@ProductId", product.ProductId);
+                        command.ExecuteNonQuery();
+                    }
 
-            return products;
+                    // Удаление продукта из коллекции
+                    Products.Remove(product);
+                }
+
+                MessageBox.Show("Выбранные продукты были успешно удалены.");
+            }
+            else
+            {
+                MessageBox.Show("Нет выбранных продуктов для удаления.");
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -311,6 +332,19 @@ namespace Baza
         private void Nfil_Click(object sender, EventArgs e)
         {
             Nfil_spisoc();
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Вы уверены удалить данные из базы данных безвозвратно?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes) 
+            {
+                DeleteSelectedProducts();
+            }
+            else
+            {
+            }
         }
     }
 }

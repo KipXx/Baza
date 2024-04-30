@@ -29,6 +29,13 @@
         </Grid>
 
         <Button Content="Обновить данные" Margin="10,49,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="UpdateDatabase_Click" VerticalAlignment="Top"/>
+        <Button Margin="160,49,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="Delete_Click" VerticalAlignment="Top">
+            <StackPanel>
+                <TextBlock Text="Удалить товар" TextAlignment="Center"/>
+                <TextBlock Text="из базы данных" TextAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
 
 
         <Grid HorizontalAlignment="Center" Margin="0,115,0,0" VerticalAlignment="Top" Width="1000" Background="#FFC1FDD3" Height="30">
@@ -41,9 +48,6 @@
             <Button Content="Добавить с фильтром" Margin="535,0,0,0" HorizontalAlignment="Left" Width="130" Height="25" VerticalAlignment="Center" Click="AddFil_Click"/>
 
         </Grid>
-
-
-
 
     </Grid>
 </Window>
