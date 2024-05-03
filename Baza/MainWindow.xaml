@@ -10,13 +10,12 @@
     <DockPanel LastChildFill="True">
         <Grid x:Name="Main">
 
-
-            <Grid DockPanel.Dock="Top" Height="73" VerticalAlignment="Top" Margin="10,10,10,0">
+            <Grid DockPanel.Dock="Top" Height="39" VerticalAlignment="Top" Margin="10,10,10,0">
 
                 <Button Content="Добавить в базу" Click="Button_Click" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
                 <Button Content="Добавить из базы" Margin="135,0,0,0" Click="Button_Click_Load" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
-                <Button Content="Обновить данные" Margin="0,39,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="UpdateDatabase_Click" VerticalAlignment="Top"/>
-                <Button Margin="135,39,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="Delete_Click" VerticalAlignment="Top">
+                <Button Content="Обновить данные" Margin="540,0,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="UpdateDatabase_Click" VerticalAlignment="Top"/>
+                <Button Margin="405,0,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="Delete_Click" VerticalAlignment="Top">
                     <StackPanel>
                         <TextBlock Text="Удалить товар" TextAlignment="Center"/>
                         <TextBlock Text="из базы данных" TextAlignment="Center"/>
@@ -33,7 +32,7 @@
             </Grid>
 
 
-            <Grid Margin="0,115,0,0" VerticalAlignment="Top" Background="#FFC1FDD3" Height="30">
+            <Grid Margin="0,50,0,0" VerticalAlignment="Top" Background="#FFC1FDD3" Height="30">
 
                 <Label Content="Материал:" Margin="200,0,0,0" Height="25" VerticalAlignment="Center" HorizontalAlignment="Left" Width="80"/>
                 <Label Content="Имя:" Height="25" VerticalAlignment="Center" HorizontalAlignment="Left" Width="40" Margin="5,0,0,0"/>
@@ -45,7 +44,7 @@
             </Grid>
 
 
-            <DataGrid x:Name="DataGrid" ItemsSource="{Binding Products}" AutoGenerateColumns="False" Margin="0,145,0,45">
+            <DataGrid x:Name="DataGrid" ItemsSource="{Binding Products}" AutoGenerateColumns="False" Margin="0,80,0,45">
                 <DataGrid.Columns>
 
                     <DataGridTemplateColumn Header="ID" Width="80">
@@ -58,7 +57,7 @@
 
                     <DataGridTextColumn Header="Имя" Binding="{Binding Name}" Width="180"  />
                     <DataGridTextColumn Header="Материал" Binding="{Binding Material}" Width="180"/>
-                    
+
                     <DataGridTemplateColumn Header="Количество" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -91,6 +90,8 @@
             <Grid DockPanel.Dock="Bottom" Background="#FF779E82" Height="45" VerticalAlignment="Bottom">
 
                 <Button Content="Очистить" HorizontalAlignment="Left" Margin="10,0,0,10" Width="80" Click="ClearButton_Click" Height="30" VerticalAlignment="Bottom"/>
+                <Button Content="Вывести недостачу товара" HorizontalAlignment="Left" Margin="95,0,0,10" Width="155" Click="Nedostacha_Click" Height="30" VerticalAlignment="Bottom"/>
+                <Button Content="Создать отчёт" HorizontalAlignment="Left" Margin="255,0,0,10" Width="90" Click="CreateOtchet_Click" Height="30" VerticalAlignment="Bottom"/>
 
             </Grid>
 

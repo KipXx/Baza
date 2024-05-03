@@ -6,7 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static Baza.AddProductWindow;
+using System.Data;
+using Microsoft.Win32;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
+using System.Windows.Data;
 
 
 namespace Baza
@@ -196,7 +201,7 @@ namespace Baza
             }
         }
 
-        private void FillList(ComboBox comboBox, string columnName)
+        private void FillList(ComboBox comboBox, string columnName) // Список товара
         {
             comboBox.Items.Clear();
 
@@ -207,7 +212,7 @@ namespace Baza
             {
                 connection.Open();
 
-                Console.WriteLine($"Executing query: SELECT {columnName} FROM Products"); // Log the query
+                Console.WriteLine($"Executing query: SELECT {columnName} FROM Products");
                 var command = new SQLiteCommand($"SELECT {columnName} FROM Products", connection);
                 var reader = command.ExecuteReader();
 
@@ -261,7 +266,174 @@ namespace Baza
         {
             AddProductWindow addProductWindow = new AddProductWindow();
             addProductWindow.OnlyNumber(e);
+        } // Проверка ввода цифор там где их не должно быть!
+
+        private void Nedostacha()
+        {
+            // Очищаем коллекцию Products
+            Products.Clear();
+
+            // Выполняем SQL-запрос к базе данных, чтобы получить отфильтрованные товары
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = "SELECT * FROM Products WHERE MinQuantity >= Quantity";
+                var command = new SQLiteCommand(sql, connection);
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    int id = Convert.ToInt32(reader["ProductId"]);
+                    string name = reader["Name"].ToString();
+                    string material = reader["Material"].ToString();
+                    int quantity = Convert.ToInt32(reader["Quantity"]);
+                    int minQuantity = Convert.ToInt32(reader["MinQuantity"]);
+                    decimal price = Convert.ToDecimal(reader["Price"]);
+
+                    Products.Add(new Product
+                    {
+                        ProductId = id,
+                        Name = name,
+                        Material = material,
+                        Quantity = quantity,
+                        MinQuantity = minQuantity,
+                        Price = price
+                    });
+                }
+                reader.Close();
+                connection.Close();
+            }
         }
+
+        private void Othet()
+        {
+            Document document = new Document();
+            try
+            {
+                Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+                saveFileDialog.Filter = "PDF файлы (*.pdf)|*.pdf";
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    PdfWriter.GetInstance(document, new FileStream(saveFileDialog.FileName, FileMode.Create));
+                    document.Open();
+
+                    // Используем шрифт Arial для поддержки русского языка
+                    string ttf = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "ARIAL.TTF");
+                    var baseFont = BaseFont.CreateFont(ttf, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                    var font = new iTextSharp.text.Font(baseFont, iTextSharp.text.Font.DEFAULTSIZE, iTextSharp.text.Font.NORMAL);
+
+                    // Предполагается, что 'document' - это экземпляр класса документа PDF (например, Document из iTextSharp)
+
+                    // Добавляем строку с названием компании
+                    Paragraph companyNameParagraph = new Paragraph("Название компании \n\n\n", font);
+                    companyNameParagraph.Alignment = Element.ALIGN_CENTER; // Выравниваем по центру
+
+                    document.Add(companyNameParagraph);
+
+
+                    // Добавляем таблицу с данными
+                    PdfPTable pdfTable = new PdfPTable(DataGrid.Columns.Count);
+                    pdfTable.TotalWidth = 550f;
+                    pdfTable.LockedWidth = true;
+
+                    // Добавляем заголовки столбцов таблицы
+                    foreach (DataGridColumn column in DataGrid.Columns)
+                    {
+                        PdfPCell cell = new PdfPCell(new Phrase(column.Header.ToString(), font)); // Предполагается, что 'font' инициализирован
+                        pdfTable.AddCell(cell);
+                    }
+
+                    // Добавляем данные из источника данных DataGrid
+                    foreach (var item in DataGrid.ItemsSource)
+                    {
+                        foreach (DataGridColumn column in DataGrid.Columns)
+                        {
+                            if (column is DataGridTextColumn)
+                            {
+                                // Обрабатываем столбцы типа DataGridTextColumn
+                                Binding binding = (column as DataGridTextColumn)?.Binding as Binding;
+                                if (binding != null)
+                                {
+                                    string propertyName = binding.Path.Path;
+                                    var property = item.GetType().GetProperty(propertyName);
+                                    if (property != null)
+                                    {
+                                        PdfPCell cell = new PdfPCell(new Phrase(property.GetValue(item)?.ToString(), font));
+                                        pdfTable.AddCell(cell);
+                                    }
+                                }
+                            }
+                            else if (column is DataGridTemplateColumn)
+                            {
+                                // Обрабатываем столбцы типа DataGridTemplateColumn
+                                var templateColumn = column as DataGridTemplateColumn;
+                                var cellContent = templateColumn?.CellTemplate?.LoadContent() as FrameworkElement;
+                                if (cellContent is TextBox)
+                                {
+                                    var binding = (cellContent as TextBox)?.GetBindingExpression(TextBox.TextProperty)?.ParentBinding;
+                                    if (binding != null)
+                                    {
+                                        string propertyName = binding.Path.Path;
+                                        var property = item.GetType().GetProperty(propertyName);
+                                        if (property != null)
+                                        {
+                                            PdfPCell cell = new PdfPCell(new Phrase(property.GetValue(item)?.ToString(), font));
+                                            pdfTable.AddCell(cell);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    document.Add(pdfTable);
+
+                    // Добавляем поля для подписей кладовщика и поставщика
+                    PdfPTable signatureTable = new PdfPTable(2);
+                    signatureTable.SpacingBefore = 20f;
+                    signatureTable.DefaultCell.Border = PdfPCell.NO_BORDER;
+                    signatureTable.WidthPercentage = 100;
+
+                    // Подпись кладовщика
+                    PdfPCell storekeeperCell = new PdfPCell(new Phrase("Подпись кладовщика: \n\n\n\n____________________", font));
+                    storekeeperCell.Border = PdfPCell.NO_BORDER;
+                    signatureTable.AddCell(storekeeperCell);
+
+                    // Подпись поставщика
+                    PdfPCell supplierCell = new PdfPCell(new Phrase("Подпись поставщика: \n\n\n\n______________________", font));
+                    supplierCell.Border = PdfPCell.NO_BORDER;
+                    signatureTable.AddCell(supplierCell);
+
+                    document.Add(signatureTable);
+
+                    // Добавление поля для даты
+                    PdfPTable dateTable = new PdfPTable(1);
+                    dateTable.SpacingBefore = 20f;
+                    dateTable.DefaultCell.Border = PdfPCell.NO_BORDER;
+                    dateTable.WidthPercentage = 100;
+
+                    // Форматирование даты
+                    string currentDate = DateTime.Now.ToString("Дата dd.MM.yyyy г."); // Подстройте формат по необходимости
+                    PdfPCell dateCell = new PdfPCell(new Phrase(currentDate, font));
+                    dateCell.Border = PdfPCell.NO_BORDER;
+                    dateTable.AddCell(dateCell);
+
+                    document.Add(dateTable);
+                    MessageBox.Show("Отчет успешно создан и сохранен по пути: " + saveFileDialog.FileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при создании отчета: " + ex.Message);
+            }
+            finally
+            {
+                document.Close();
+            }
+        }
+
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -329,6 +501,16 @@ namespace Baza
         {
             AddProductWindow addProductWindow = new AddProductWindow();
             addProductWindow.Show();
+        }
+
+        private void Nedostacha_Click(object sender, RoutedEventArgs e)
+        {
+            Nedostacha();
+        }
+
+        private void CreateOtchet_Click(object sender, RoutedEventArgs e)
+        {
+            Othet();
         }
     }
 }

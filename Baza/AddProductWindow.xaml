@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Baza"
         mc:Ignorable="d"
-        Title="Добавить продукт" Height="280" Width="370">
+        Title="Добавить продукт" Height="280" Width="370"
+        ResizeMode="NoResize">
+        
 
     <Grid>
         <Grid Margin="25,20,0,0" HorizontalAlignment="Left" Width="320" Height="184" VerticalAlignment="Top">
