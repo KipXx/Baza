@@ -12,6 +12,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
 using System.Windows.Data;
+using ClosedXML.Excel;
 
 
 namespace Baza
@@ -262,6 +263,41 @@ namespace Baza
             }
         }
 
+        private void DeleteMarkerDatabase()
+        {
+            // Получаем выбранные элементы из таблицы
+            var selectedProducts = DataGrid.SelectedItems.Cast<Product>().ToList();
+
+            // Предполагаем, что у вас есть объект, представляющий вашу базу данных
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                // Перебираем выбранные продукты
+                foreach (var product in selectedProducts)
+                {
+                    // Создаем SQL-запрос для удаления продукта с соответствующим идентификатором
+                    string deleteQuery = "DELETE FROM Products WHERE ProductId = @ProductId";
+
+                    // Создаем команду для выполнения SQL-запроса
+                    using (var command = new SQLiteCommand(deleteQuery, connection))
+                    {
+                        // Добавляем параметр идентификатора продукта
+                        command.Parameters.AddWithValue("@ProductId", product.ProductId);
+
+                        // Выполняем SQL-запрос
+                        command.ExecuteNonQuery();
+                    }
+                    try
+                    {
+                        MessageBox.Show("Данные удалены из базы данных.","Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        Products.Remove(product);    
+                    }
+                    catch { }
+                }
+            }
+        }
+
         private void OnlyNumbers(object sender, TextCompositionEventArgs e)
         {
             AddProductWindow addProductWindow = new AddProductWindow();
@@ -433,6 +469,60 @@ namespace Baza
             }
         }
 
+        private void Excel_Create(string filePath)
+        {
+            // Создаем новый экземпляр рабочей книги Excel
+            var workbook = new XLWorkbook();
+
+            // Добавляем новый лист в рабочую книгу
+            var worksheet = workbook.Worksheets.Add("Sheet1");
+
+            // Добавляем заголовки столбцов
+            worksheet.Cell(1, 1).Value = "ID";
+            worksheet.Cell(1, 2).Value = "Имя";
+            worksheet.Cell(1, 3).Value = "Материал";
+            worksheet.Cell(1, 4).Value = "Количество";
+            worksheet.Cell(1, 5).Value = "Мин Количество";
+            worksheet.Cell(1, 6).Value = "Сумма";
+
+
+            // Записываем данные в новый файл Excel и добавляем рамки вокруг ячеек
+            for (int i = 0; i < Products.Count; i++)
+            {
+                worksheet.Cell(i + 2, 1).Value = Products[i].ProductId;
+                worksheet.Cell(i + 2, 2).Value = Products[i].Name;
+                worksheet.Cell(i + 2, 3).Value = Products[i].Material;
+                worksheet.Cell(i + 2, 4).Value = Products[i].Quantity;
+                worksheet.Cell(i + 2, 5).Value = Products[i].MinQuantity;
+                worksheet.Cell(i + 2, 6).Value = Products[i].Price;
+
+                // Добавляем рамки вокруг каждой ячейки
+                for (int j = 1; j <= 6; j++)
+                {
+                    worksheet.Cell(i + 2, j).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Cell(i + 2, j).Style.Border.OutsideBorderColor = XLColor.Black;
+                }
+            }
+
+            // Автоматически подстраиваем ширину столбцов под содержимое
+            worksheet.Columns().AdjustToContents();
+
+            // Сохраняем рабочую книгу в новый файл Excel
+            try
+            {
+                // Сохраняем рабочую книгу в новый файл Excel
+                workbook.SaveAs(filePath);
+
+                // Показываем сообщение об успешном сохранении
+                MessageBox.Show("Таблица Excel успешно создана и сохранена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                // Показываем сообщение об ошибке
+                MessageBox.Show($"Ошибка при сохранении таблицы Excel: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
 
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -492,9 +582,7 @@ namespace Baza
             {
                 DeleteSelectedProducts();
             }
-            else
-            {
-            }
+            else { }
         }
 
         private void AddNewWindow_Click(object sender, RoutedEventArgs e)
@@ -511,6 +599,43 @@ namespace Baza
         private void CreateOtchet_Click(object sender, RoutedEventArgs e)
         {
             Othet();
+        }
+
+        private void CreateExcel_Click(object sender, RoutedEventArgs e)
+        {
+            // Создаем диалоговое окно для выбора пути и имени нового файла Excel
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.Filter = "Excel Files (*.xlsx, *.xlsm, *.xls) | *.xlsx;*.xlsm;*.xls";
+
+            // Показываем диалоговое окно и ожидаем выбора пользователем пути и имени нового файла
+            if (dialog.ShowDialog() == true)
+            {
+                // Создаем новый файл Excel по выбранному пользователем пути и имени
+                Excel_Create(dialog.FileName);
+            }
+        }
+
+        private void DeleteMarker_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Вы уверены удалить выделенные данные из базы данных безвозратно?", "Предупреждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes) 
+            {
+                DeleteMarkerDatabase();
+            }
+            else { }
+        }
+
+        private void ClearButtonMarker_Click(object sender, RoutedEventArgs e)
+        {
+            // Получаем выбранные элементы из DataGrid
+            var selectedProducts = DataGrid.SelectedItems.Cast<Product>().ToList();
+
+            // Удаляем выбранные элементы из коллекции, связанной с DataGrid
+            foreach (var product in selectedProducts)
+            {
+                Products.Remove(product);
+            }
         }
     }
 }

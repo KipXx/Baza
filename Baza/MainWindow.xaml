@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Baza"
         mc:Ignorable="d"
-        Title="Управление закупками" Height="505" Width="1000">
+        Title="Управление закупками" Height="505" Width="1000" WindowStartupLocation="CenterScreen">
 
     <DockPanel LastChildFill="True">
         <Grid x:Name="Main">
@@ -14,7 +14,7 @@
 
                 <Button Content="Добавить в базу" Click="Button_Click" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
                 <Button Content="Добавить из базы" Margin="135,0,0,0" Click="Button_Click_Load" HorizontalAlignment="Left" Width="130" Height="34" VerticalAlignment="Top"/>
-                <Button Content="Обновить данные" Margin="540,0,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="UpdateDatabase_Click" VerticalAlignment="Top"/>
+                <Button Content="Обновить данные" Margin="675,0,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="UpdateDatabase_Click" VerticalAlignment="Top"/>
                 <Button Margin="405,0,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="Delete_Click" VerticalAlignment="Top">
                     <StackPanel>
                         <TextBlock Text="Удалить товар" TextAlignment="Center"/>
@@ -25,6 +25,12 @@
                     <StackPanel>
                         <TextBlock Text="Добавить товар" TextAlignment="Center"/>
                         <TextBlock Text="отдельно в базу" TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Margin="540,0,0,0" HorizontalAlignment="Left" Width="130" Height="34" Click="DeleteMarker_Click" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Text="Удалить выделенный" TextAlignment="Center"/>
+                        <TextBlock Text="товар из базы данных" TextAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
@@ -47,13 +53,7 @@
             <DataGrid x:Name="DataGrid" ItemsSource="{Binding Products}" AutoGenerateColumns="False" Margin="0,80,0,45">
                 <DataGrid.Columns>
 
-                    <DataGridTemplateColumn Header="ID" Width="80">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ProductId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="OnlyNumbers"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Id" Binding="{Binding ProductId}" Width="15"  />
 
                     <DataGridTextColumn Header="Имя" Binding="{Binding Name}" Width="180"  />
                     <DataGridTextColumn Header="Материал" Binding="{Binding Material}" Width="180"/>
@@ -90,8 +90,10 @@
             <Grid DockPanel.Dock="Bottom" Background="#FF779E82" Height="45" VerticalAlignment="Bottom">
 
                 <Button Content="Очистить" HorizontalAlignment="Left" Margin="10,0,0,10" Width="80" Click="ClearButton_Click" Height="30" VerticalAlignment="Bottom"/>
-                <Button Content="Вывести недостачу товара" HorizontalAlignment="Left" Margin="95,0,0,10" Width="155" Click="Nedostacha_Click" Height="30" VerticalAlignment="Bottom"/>
-                <Button Content="Создать отчёт" HorizontalAlignment="Left" Margin="255,0,0,10" Width="90" Click="CreateOtchet_Click" Height="30" VerticalAlignment="Bottom"/>
+                <Button Content="Вывести недостачу товара" HorizontalAlignment="Left" Margin="240,0,0,10" Width="155" Click="Nedostacha_Click" Height="30" VerticalAlignment="Bottom"/>
+                <Button Content="Создать отчёт" HorizontalAlignment="Left" Margin="400,0,0,10" Width="90" Click="CreateOtchet_Click" Height="30" VerticalAlignment="Bottom"/>
+                <Button Content="Создать Excel таблицу" HorizontalAlignment="Left" Margin="495,0,0,10" Width="130" Click="CreateExcel_Click" Height="30" VerticalAlignment="Bottom"/>
+                <Button Content="Очистить выделенное" HorizontalAlignment="Left" Margin="95,0,0,10" Width="140" Click="ClearButtonMarker_Click" Height="30" VerticalAlignment="Bottom"/>
 
             </Grid>
 
