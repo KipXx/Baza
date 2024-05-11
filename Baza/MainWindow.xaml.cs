@@ -7,7 +7,6 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Data;
-using Microsoft.Win32;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
@@ -41,15 +40,15 @@ namespace Baza
 
         public ObservableCollection<Product> Products { get; set; } = new ObservableCollection<Product>();
 
-        private void SaveToDatabase() // Сохранить из таблицы
+        private void SaveToDatabase() // Метод для сохранения данных в базу данных
         {
-            List<string> messages = new List<string>(); // Создаем список для сообщений
+            List<string> messages = new List<string>(); // Создаем список для хранения сообщений о продуктах
 
-            using (var connection = new SQLiteConnection(connectionString))
+            using (var connection = new SQLiteConnection(connectionString)) // Используем подключение к SQLite базе данных
             {
-                connection.Open();
+                connection.Open(); // Открываем соединение
 
-                foreach (var product in Products)
+                foreach (var product in Products) // Для каждого продукта в списке
                 {
                     // Проверяем, существует ли продукт с таким же ID
                     string checkQuery = $"SELECT COUNT(*) FROM Products WHERE ProductId = {product.ProductId}";
@@ -69,8 +68,8 @@ namespace Baza
                                    $"VALUES ({product.ProductId}, '{product.Name}', '{product.Material}', {product.Quantity}, {product.MinQuantity}, {product.Price})";
                     using (SQLiteCommand command = new SQLiteCommand(query, connection))
                     {
-                        command.ExecuteNonQuery();
-                        MessageBox.Show("Товар добавлен в таблицу", "Добавлено", MessageBoxButton.OK, MessageBoxImage.Information);
+                        command.ExecuteNonQuery(); // Выполняем команду вставки
+                        MessageBox.Show("Товар добавлен в таблицу", "Добавлено", MessageBoxButton.OK, MessageBoxImage.Information); // Показываем сообщение об успешной вставке
                     }
                 }
             }
@@ -79,7 +78,7 @@ namespace Baza
             if (messages.Count > 0)
             {
                 string allMessages = string.Join("\n", messages) + "\nУже существуют в базе данных!";
-                MessageBox.Show(allMessages, "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(allMessages, "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning); // Показываем сообщение с предупреждениями
             }
         }
 
@@ -134,11 +133,10 @@ namespace Baza
             {
                 connection.Open();
 
-                using (SQLiteCommand command = new SQLiteCommand(query, connection)) // Объявление переменной command
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
                 {
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        // Проверяем наличие результатов
                         if (!reader.HasRows)
                         {
                             MessageBox.Show("Товар с указанными параметрами не найден.", "Поиск", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -276,16 +274,12 @@ namespace Baza
                 // Перебираем выбранные продукты
                 foreach (var product in selectedProducts)
                 {
-                    // Создаем SQL-запрос для удаления продукта с соответствующим идентификатором
                     string deleteQuery = "DELETE FROM Products WHERE ProductId = @ProductId";
 
-                    // Создаем команду для выполнения SQL-запроса
                     using (var command = new SQLiteCommand(deleteQuery, connection))
                     {
                         // Добавляем параметр идентификатора продукта
                         command.Parameters.AddWithValue("@ProductId", product.ProductId);
-
-                        // Выполняем SQL-запрос
                         command.ExecuteNonQuery();
                     }
                     try
@@ -298,11 +292,11 @@ namespace Baza
             }
         }
 
-        private void OnlyNumbers(object sender, TextCompositionEventArgs e)
+        private void OnlyNumbers(object sender, TextCompositionEventArgs e) // Проверка ввода цифор там где их не должно быть!
         {
             AddProductWindow addProductWindow = new AddProductWindow();
             addProductWindow.OnlyNumber(e);
-        } // Проверка ввода цифор там где их не должно быть!
+        } 
 
         private void Nedostacha()
         {
@@ -523,6 +517,47 @@ namespace Baza
             }
         }
 
+        private void Import_Excel()
+        {
+            // Открывает диалог выбора файла
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "Excel files (*.xlsx)|*.xlsx";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using (var workbook = new ClosedXML.Excel.XLWorkbook(openFileDialog.FileName))
+                    {
+                        var worksheet = workbook.Worksheet(1);
+                        var range = worksheet.RangeUsed();
+
+                        // Создаем список продуктов
+                        var products = new List<Product>();
+
+                        foreach (var row in range.RowsUsed().Skip(1)) // Пропускаем заголовок
+                        {
+                            var product = new Product
+                            {
+                                ProductId = row.Cell(1).GetValue<int>(),
+                                Name = row.Cell(2).GetValue<string>(),
+                                Material = row.Cell(3).GetValue<string>(),
+                                Quantity = row.Cell(4).GetValue<int>(),
+                                MinQuantity = row.Cell(5).GetValue<int>(),
+                                Price = row.Cell(6).GetValue<decimal>(),
+                            };
+                            products.Add(product);
+                        }
+
+                        // Установка источника данных для DataGrid
+                        DataGrid.ItemsSource = products;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при чтении файла: " + ex.Message);
+                }
+            }
+        }
 
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -636,6 +671,11 @@ namespace Baza
             {
                 Products.Remove(product);
             }
+        }
+
+        private void ImportExcel_Click(object sender, RoutedEventArgs e)
+        {
+            Import_Excel();
         }
     }
 }

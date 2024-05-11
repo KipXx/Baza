@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Baza"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <BitmapImage x:Key="AppIcon" UriSource="ico.png"/>
     </Application.Resources>
 </Application>

@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Baza"
-        mc:Ignorable="d"
+        mc:Ignorable="d" 
+        Icon="{StaticResource AppIcon}"
         Title="Управление закупками" Height="505" Width="1000" WindowStartupLocation="CenterScreen">
+        
 
     <DockPanel LastChildFill="True">
         <Grid x:Name="Main">
@@ -53,7 +55,7 @@
             <DataGrid x:Name="DataGrid" ItemsSource="{Binding Products}" AutoGenerateColumns="False" Margin="0,80,0,45">
                 <DataGrid.Columns>
 
-                    <DataGridTextColumn Header="Id" Binding="{Binding ProductId}" Width="15"  />
+                    <DataGridTextColumn Header="ID" Binding="{Binding ProductId}" Width="15"  />
 
                     <DataGridTextColumn Header="Имя" Binding="{Binding Name}" Width="180"  />
                     <DataGridTextColumn Header="Материал" Binding="{Binding Material}" Width="180"/>
@@ -93,6 +95,7 @@
                 <Button Content="Вывести недостачу товара" HorizontalAlignment="Left" Margin="240,0,0,10" Width="155" Click="Nedostacha_Click" Height="30" VerticalAlignment="Bottom"/>
                 <Button Content="Создать отчёт" HorizontalAlignment="Left" Margin="400,0,0,10" Width="90" Click="CreateOtchet_Click" Height="30" VerticalAlignment="Bottom"/>
                 <Button Content="Создать Excel таблицу" HorizontalAlignment="Left" Margin="495,0,0,10" Width="130" Click="CreateExcel_Click" Height="30" VerticalAlignment="Bottom"/>
+                <Button Content="Импортировать из Excel" HorizontalAlignment="Left" Margin="630,0,0,10" Width="145" Click="ImportExcel_Click" Height="30" VerticalAlignment="Bottom"/>
                 <Button Content="Очистить выделенное" HorizontalAlignment="Left" Margin="95,0,0,10" Width="140" Click="ClearButtonMarker_Click" Height="30" VerticalAlignment="Bottom"/>
 
             </Grid>

@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Baza"
         mc:Ignorable="d"
         Title="Добавить продукт" Height="280" Width="370"
+        Icon="{StaticResource AppIcon}"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
         
 
