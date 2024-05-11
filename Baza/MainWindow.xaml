@@ -55,7 +55,7 @@
             <DataGrid x:Name="DataGrid" ItemsSource="{Binding Products}" AutoGenerateColumns="False" Margin="0,80,0,45">
                 <DataGrid.Columns>
 
-                    <DataGridTextColumn Header="ID" Binding="{Binding ProductId}" Width="15"  />
+                    <DataGridTextColumn Header="ID" Binding="{Binding ProductId}" Width="35"  />
 
                     <DataGridTextColumn Header="Имя" Binding="{Binding Name}" Width="180"  />
                     <DataGridTextColumn Header="Материал" Binding="{Binding Material}" Width="180"/>

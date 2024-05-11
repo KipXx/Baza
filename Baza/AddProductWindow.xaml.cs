@@ -65,6 +65,7 @@ namespace Baza
                     }
                     else
                     {
+                        MessageBox.Show("Продукт успешно добавлен в базу данных.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         Close(); // Закрываем окно только если продукт был успешно добавлен
                     }
                 }
